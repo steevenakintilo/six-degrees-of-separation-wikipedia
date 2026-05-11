@@ -16,7 +16,6 @@ from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import pyperclip
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -44,6 +43,8 @@ class Scrapdata():
 class WikiSrapping(Scrapdata):
     def __init__(self,headless=False):
         self.driver = Scrapdata(headless).driver
+        self.all_file = self.print_file_content("../all_wikipedia_page_fr.txt").split("\n")
+        self.chunck_size = int(len(self.all_file)/50)
         #self.wikipedia_url = "https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal"
     
     # def search_page(self, user_to_search):
@@ -125,43 +126,51 @@ class WikiSrapping(Scrapdata):
         except:
             return None , f"https://fr.wikipedia.org/wiki/{user_to_search}"
 
-# toto = "Albert_Ammons"
-# toto = "Jean-Pierre_Bertrand_(pianiste)"
-# #test = "Section_des_Gobelins"
-# print(CODE_PATH)
-# all_file = print_file_content("../all_wikipedia_page_fr.txt").split("\n")
-# random_page = random.choice(all_file)
-# print(random_page)
 
+
+    def run_script(self,batch_nb):
+        
+        
+
+        split_list = self.split_list(self.all_file,self.chunck_size)
+        current_list = split_list[batch_nb]
+        already_done_page = self.print_file_content("already_done_page_link.txt").split("\n")
+
+        for index , page in enumerate(current_list):
+            if index % 9000 == 0:
+                print(f"{page} {index} {int(9000 / 91663) * 100}% done")
+            try:
+                is_real , page_link = self.is_user_real(current_list[0])
+                if page_link in already_done_page:
+                    continue
+                page_name = current_list[batch_nb]
+                
+                
+                info_dict = {"page_name":page_name,"link":page_link,"is_real":is_real}
+
+                if is_real:
+                    self.write_into_file(rf"{CODE_PATH}\real_people_dir\dict_of_real_people.txt",info_dict+"\n")
+                    self.write_into_file(rf"{CODE_PATH}\real_people_dir\list_of_real_people.txt",page_name+"\n")
+                    self.write_into_file("already_done_element.txt",page_name+"\n")
+                    self.write_into_file("already_done_page_link.txt",page_link+"\n")
+
+                elif is_real == False:
+                    self.write_into_file(rf"{CODE_PATH}\non_real_people_dir\dict_of_non_real_people.txt",info_dict+"\n")
+                    self.write_into_file(rf"{CODE_PATH}\non_real_people_dir\list_of_non_real_people.txt",page_name+"\n")
+                    self.write_into_file("already_done_element.txt",page_name+"\n")
+                    self.write_into_file("already_done_page_link.txt",page_link+"\n")
+                    
+                else:
+                    self.write_into_file(rf"{CODE_PATH}\error_people_dir\dict_of_error_people.txt",info_dict+"\n")
+                    self.write_into_file(rf"{CODE_PATH}\error_people_dir\list_of_error_people.txt",page_name+"\n")
+                    self.write_into_file("already_done_element.txt",page_name+"\n")
+                    self.write_into_file("already_done_page_link.txt",page_link+"\n")
+            except:
+                self.write_into_file(rf"{CODE_PATH}\error_people_dir\dict_of_error_people.txt",info_dict+"\n")
+                self.write_into_file(rf"{CODE_PATH}\error_people_dir\list_of_error_people.txt",page_name+"\n")
+                self.write_into_file("already_done_element.txt",page_name+"\n")
+                self.write_into_file("already_done_page_link.txt",page_link+"\n")
+        
 
 x = WikiSrapping(True)
-all_file = x.print_file_content("../all_wikipedia_page_fr.txt").split("\n")
-CHUNK_SIZE = int(len(all_file)/50)
-
-split_list = x.split_list(all_file,CHUNK_SIZE)
-current_list = split_list[0]
-is_real , page_link = x.is_user_real(current_list[0])
-all_file = x.print_file_content("../all_wikipedia_page_fr.txt").split("\n")
-page_name = current_list[0]
-info_dict = {"page_name":page_name,"link":page_link,"is_real":is_real}
-print(info_dict)
-quit()
-
-if is_real:
-    x.write_into_file(rf"{CODE_PATH}\real_people_dir\dict_of_real_people.txt",info_dict+"\n")
-    x.write_into_file(rf"{CODE_PATH}\real_people_dir\list_of_real_people.txt",page_name+"\n")
-    x.write_into_file("already_done_element.txt",page_name+"\n")
-    x.write_into_file("already_done_page_link.txt",page_link+"\n")
-
-elif is_real == False:
-    x.write_into_file(rf"{CODE_PATH}\non_real_people_dir\dict_of_non_real_people.txt",info_dict+"\n")
-    x.write_into_file(rf"{CODE_PATH}\non_real_people_dir\list_of_non_real_people.txt",page_name+"\n")
-    x.write_into_file("already_done_element.txt",page_name+"\n")
-    x.write_into_file("already_done_page_link.txt",page_link+"\n")
-    
-else:
-    x.write_into_file(rf"{CODE_PATH}\error_people_dir\dict_of_error_people.txt",info_dict+"\n")
-    x.write_into_file(rf"{CODE_PATH}\error_people_dir\list_of_error_people.txt",page_name+"\n")
-    x.write_into_file("already_done_element.txt",page_name+"\n")
-    x.write_into_file("already_done_page_link.txt",page_link+"\n")
-    
+x.run_script(int(sys.argv[1]))
