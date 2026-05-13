@@ -2,11 +2,12 @@ import subprocess
 import sys
 
 processes = []
+xxx = 49
 
-for batch_nb in range(51):  # 0 to 49
+for batch_nb in range(xxx):  # 0 to 49
     p = subprocess.Popen([
         sys.executable,
-        "wikisraping.py",
+        "wikiscroping.py",
         str(batch_nb)
     ])
     processes.append(p)

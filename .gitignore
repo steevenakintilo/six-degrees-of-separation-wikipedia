@@ -219,5 +219,9 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+/wikipedia_fr_all_maxi_2026-02.zim
+./wikipedia_fr_all_maxi_2026-02.zim
+wikipedia_fr_all_maxi_2026-02.zim
+.wikipedia_fr_all_maxi_2026-02.zim
 *.txt
 *.zim
