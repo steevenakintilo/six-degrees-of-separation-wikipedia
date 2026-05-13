@@ -21,6 +21,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from libzim.reader import Archive
 from urllib.parse import unquote
 
+from bs4 import BeautifulSoup
 
 import time
 from global_variable import *
@@ -46,6 +47,8 @@ class WikiSrapping(Scrapdata):
     def __init__(self,headless=False):
         self.driver = Scrapdata(headless).driver
         self.all_file = self.print_file_content("../all_wikipedia_page_fr.txt").split("\n")
+        self.all_real_people = self.print_file_content(rf"{CODE_PATH}\real_people_dir\list_of_real_people_diff.txt").split("\n")
+        
         self.size_of_batch_nb = 200
         self.chunck_size = int(len(self.all_file)/self.size_of_batch_nb)
         self.zim = Archive("../wikipedia_fr_all_maxi_2026-02.zim")
@@ -166,10 +169,34 @@ class WikiSrapping(Scrapdata):
             #traceback.print_exc()
             return None, f"https://fr.wikipedia.org/wiki/{page_name}"
 
+    def get_page_name_of_someone(self,page_name):
+        # Example: get article by title
+        try:
+            entry = self.zim.get_entry_by_title(self.clean_title(page_name))
+
+            # Read raw HTML
+            html = entry.get_item().content.tobytes().decode("utf-8", errors="replace")
+            soup = BeautifulSoup(html, "html.parser")
+            intro_text =  str(html[:10000])
+            intro_text = str(html)
+            split_link = intro_text.split("<a href=")
+
+            for link in split_link:
+                if "title=" in link:
+                    split_link_ = link.split("title=")[1].split(">")
+                    link_name = split_link_[0].replace('"',"")
+                    if link_name in self.all_real_people:
+                        print(link_name)
+                        print("-"*50)
+                    
+            #print(soup.get_text()[:1000])
+
+            #print(intro_text.split("<a href="))
+        except:
+            traceback.print_exc()
+            return ""
     def run_script(self):
         
-        
-
         split_list = self.split_list(self.all_file,self.chunck_size)
         #current_list = split_list[batch_nb]
 
@@ -204,4 +231,4 @@ class WikiSrapping(Scrapdata):
                 self.write_into_file(rf"{CODE_PATH}\error_people_dir\list_of_error_people.txt",page_name+"\n")
             
 x = WikiSrapping(True)
-x.run_script()
+x.get_page_name_of_someone("Albert_Ammons")

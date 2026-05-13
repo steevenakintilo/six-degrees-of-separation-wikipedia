@@ -48,7 +48,7 @@ class Scrapdata():
 class WikiSrapping(Scrapdata):
     def __init__(self,headless=False):
         # self.driver = Scrapdata(headless).driver
-        path = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\error_people_dir\list_of_error_people.txt"
+        path = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\error_people_dir\list_of_error_people0.txt"
         self.all_file = self.print_file_content(path).split("\n")
         xxx = 49
         
@@ -133,11 +133,11 @@ class WikiSrapping(Scrapdata):
 
             # Get visible text only
             whole_page_text = soup.get_text(" ", strip=True)
-
+            
             if "Personnage de fiction apparaissant dans" in whole_page_text:
                 return False, url
 
-            if "Biographie" in whole_page_text and "Naissance" in whole_page_text:
+            if ("Biographie" in whole_page_text and "Naissance" in whole_page_text) or ("Biographie" in whole_page_text and "Décès" in whole_page_text):
                 return True, url
 
             return False, url
@@ -170,7 +170,7 @@ class WikiSrapping(Scrapdata):
         for index , page in enumerate(self.all_file):
             
             if index % 1000 == 0:
-                print(f"{page} {index} {batch_nb} {int((index / 25122) * 100)}% done")
+                print(f"{page} {index} {batch_nb} {int((index / 1100) * 100)}% done")
             
             try:
                 is_real , page_link = self.is_user_real(page)
@@ -181,8 +181,7 @@ class WikiSrapping(Scrapdata):
                 
                 
                 info_dict = str({"page_name":page,"link":page_link,"is_real":is_real})
-            
-
+                time.sleep(1)
                 if is_real:
                     self.write_into_file(rf"{CODE_PATH}\real_people_dir\dict_of_real_people{batch_nb}.txt",info_dict+"\n")
                     self.write_into_file(rf"{CODE_PATH}\real_people_dir\list_of_real_people{batch_nb}.txt",page+"\n")
