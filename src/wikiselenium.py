@@ -22,7 +22,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote
-
+import re
 
 import time
 from global_variable import *
@@ -48,12 +48,18 @@ class Scrapdata():
 class WikiSrapping(Scrapdata):
     def __init__(self,headless=False):
         self.driver = Scrapdata(headless).driver
-        path = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\error_people_dir\list_of_error_people2.txt"
+        path = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\error_link_of_people_dir\error_link_of_people_page.txt"
         self.all_file = self.print_file_content(path).split("\n")
         xxx = 1
         
         self.size_of_batch_nb = xxx
         self.chunck_size = int(len(self.all_file)/self.size_of_batch_nb)
+        
+        self.all_real_people = self.print_file_content(rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\real_people_dir\list_of_real_people_diff.txt").split("\n")
+        
+        self.all_real_people_set = set(self.all_real_people)
+     
+        
         #self.wikipedia_url = "https://fr.wikipedia.org/wiki/Wikip%C3%A9dia:Accueil_principal"
     
     # def search_page(self, user_to_search):
@@ -115,6 +121,47 @@ class WikiSrapping(Scrapdata):
         except FileNotFoundError:
             pass
 
+    
+    def get_all_link_of_a_page(self,page_name):
+        # Example: get article by title
+        #try:
+        list_of_link = []
+        # Read raw HTML
+        # html = entry.get_item().content.tobytes().decode("utf-8", errors="replace")
+        # #soup = BeautifulSoup(html, "html.parser")
+        # #intro_text =  str(html[:10000])
+        # intro_text = str(html)
+        
+
+        self.driver.get(f"https://fr.wikipedia.org/wiki/{page_name}")
+        info_box = WebDriverWait(self.driver, WAIT_TIME).until(
+                EC.element_to_be_clickable((By.XPATH, "/html/body"))
+        )
+        text = self.driver.page_source
+
+        #split_link = intro_text.split("<a href=")
+        titles = re.findall(r'<a\s[^>]*title="([^"]+)"', text)
+
+        #print(titles)
+        for title in titles:
+            if title in self.all_real_people_set and title not in list_of_link:
+                list_of_link.append(title)
+        # for link in split_link:
+        #     if "title=" in link:
+        #         split_link_ = link.split("title=")[1].split(">")
+        #         link_name = split_link_[0].replace('"',"")
+        #         if link_name in self.all_real_people_set and link_name not in list_of_link:
+        #             list_of_link.append(link_name)
+                
+        #print(soup.get_text()[:1000])
+        
+        #print(list_of_link)
+        return list_of_link
+        #print(intro_text.split("<a href="))
+        # except:
+        #     return ["error","Nan","404"]
+        #     traceback.print_exc()
+        #     return ""
 
     def is_user_real(self, user_to_search, batch_nb=0):
         try:
@@ -250,5 +297,29 @@ class WikiSrapping(Scrapdata):
                 # self.write_into_file(rf"already_done_page_link{batch_nb}.txt",page_link+"\n")
 
 
+    def run_link_script(self,batch_nb):
+        
+        #split_list = self.split_list(self.all_real_people,self.chunck_size)
+        current_list = self.all_file
+        
+        #already_done_page = self.print_file_content(rf"already_done_page_link{batch_nb + 1}.txt").split("\n")
+
+        for index , page in enumerate(current_list):
+            if len(page) == 0 or len(page.replace(" ","")) == 0:
+                continue
+            if index % int(len(current_list) / 10) == 0 and batch_nb == 2:
+                print(f"{page} {index} {batch_nb} {(index/int(len(current_list))) * 100}% done")
+            
+            try:
+                list_of_link = self.get_all_link_of_a_page(page)
+                time.sleep(0.1)
+                self.write_into_file(rf"{CODE_PATH}\link_of_people_dir\link_of_people_link{batch_nb + 1}.txt",str({"page_name":page,"list_of_link":list_of_link})+"\n")
+
+            except:
+                self.write_into_file(rf"{CODE_PATH}\error_link_of_people_dir\error_link_of_people_link{batch_nb + 1}.txt",str({"page_name":page,"list_of_link":[]})+"\n")
+                self.write_into_file(rf"{CODE_PATH}\error_link_of_people_dir\error_link_of_people_page{batch_nb + 1}.txt",page+"\n")
+                
+
+
 x = WikiSrapping(True)
-x.run_script(int(sys.argv[1]))
+x.run_link_script(int(sys.argv[1]))

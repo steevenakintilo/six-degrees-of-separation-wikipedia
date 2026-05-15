@@ -10,3 +10,22 @@ INFO_BOX_XPATH = "/html/body/div[3]/div/div[3]/main/div[3]/div[3]/div[1]/table[1
 WAIT_TIME = 5
 
 CODE_PATH = os.getcwd().replace("","")
+
+banned_word = [
+    "Décès en",
+    "Décés en",
+    "Déces en",
+    "Déces en",
+    "Décés en",
+    "Decès en",
+    "Decés en",
+    "Deces en",
+    "Liste de",
+    "Liste des",
+    "Peplum",
+    "Péplum",
+    "Encore le roman feuilleton",
+    "P:LSP",
+    "Éditions"
+]
+
