@@ -60,9 +60,9 @@ class WikiSrapping(Scrapdata):
         
         self.all_real_people_set = set(self.all_real_people)
         
-        self.size_of_batch_nb = 299
-        self.chunck_size = int(len(self.all_real_people)/self.size_of_batch_nb)
-        #self.chunck_size = 30
+        self.size_of_batch_nb = 50
+        self.chunck_size = int(len(self.all_real_people_set)/self.size_of_batch_nb)
+        #self.chunck_size = 10
         #self.zim = Archive("../wikipedia_fr_all_maxi_2026-02.zim")
         self.zim = Archive(rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\wikipedia_fr_all_maxi_2026-02.zim")
         
@@ -169,9 +169,38 @@ class WikiSrapping(Scrapdata):
 
             html = entry.get_item().content.tobytes().decode("utf-8", errors="replace")
             text = html[:10000].lower()
-
+            text_normal = html[:10000]
+            
+            if "fonctions" in text:
+                text = html[:100000].lower()    
+                text_normal = html[:100000]
+            
+                
             url = f"https://fr.wikipedia.org/wiki/{page_name}"
 
+            if "_en_" in page_name and "Biographies" in text_normal:
+                return False,url
+            skip = False
+            for word in banned_word:
+                if word in page_name:
+                    #print("yooooo " , name)
+                    skip = True
+                    break
+            
+
+
+            if "Cet article présente les faits marquants de" in text_normal:
+                return False, url    
+            if "Cet article concerne des événements prévus ou attendus." in text_normal:
+                return False, url    
+                
+            if "Cette page concerne des événements d'actualité qui se sont produits" in text_normal:
+                return False, url    
+            if "Le présent article donne différentes informations sur" in text_normal:
+                return False , url
+            if skip:
+                return False, url
+            
             # ---- FICTION ----
             if (
                 "personnage de fiction apparaissant dans" in text or
@@ -191,14 +220,14 @@ class WikiSrapping(Scrapdata):
                     "date de naissance" in text or
                     "lieu de naissance" in text
                 ) and (
-                    "biographie" in text or
+                    "Biographie" in text_normal or
                     "informations générales" in text
                 )
             ) or (
                 
                 ("naissance" in text and "activité principale" in text) or 
-                ("biographie" in text and "naissance" in text) or 
-                ("biographie" in text and "décès" in text)
+                ("Biographie" in text_normal and "naissance" in text) or 
+                ("Biographie" in text_normal and "décès" in text)
             ):    return True, url
 
             # ---- VRAIE PERSONNE : catégories ----
@@ -375,9 +404,10 @@ class WikiSrapping(Scrapdata):
         current_list = split_list[batch_nb]
 
         #already_done_page = self.print_file_content(rf"already_done_page_link{batch_nb + 1}.txt").split("\n")
-
+        
         for index , page in enumerate(current_list):
-            if index % int(len(current_list) / 20) == 0:
+            if index % int(len(current_list) / 10) == 0 and batch_nb == 1:
+            
                 print(f"{page} {index} {(index/int(len(current_list))) * 100}% done")
             
             try:
@@ -420,8 +450,8 @@ class WikiSrapping(Scrapdata):
             if len(page) == 0 or len(page.replace(" ","")) == 0:
                 continue
             
-            # if index % int(len(current_list) / 10) == 0 and batch_nb == 2:
-            #     print(f"{page} {index} {batch_nb} {(index/int(len(current_list))) * 100}% done")
+            if index % int(len(current_list) / 10) == 0 and batch_nb == 2:
+                print(f"{page} {index} {batch_nb} {(index/int(len(current_list))) * 100}% done")
             
             try:
                 list_of_link = self.get_all_link_of_a_page(page)
@@ -613,12 +643,30 @@ class WikiSrapping(Scrapdata):
 
 a = 5
 
-# if a == 0:
-#     start = time.time()      
-#     x = WikiSrapping(True)
-#     x.get_all_link_of_a_page("Albert_Ammons")
-#     end = time.time()
-#     print(f"Total runtime of the program is {end - start} seconds")
+
+# Get all real user using zim
+
+# x = WikiSrapping(True)
+# x.run_script(int(sys.argv[1]))
+
+# # Merging all the file of real people into a big one
+
+# x = WikiSrapping(True)
+# x.merge_file(x.size_of_batch_nb)
+
+# # Get all real user link using zim
+
+# x = WikiSrapping(True)
+# x.run_link_script(int(sys.argv[1]))
+
+# # Merging all the file of real people link into a big one
+# x = WikiSrapping(True)
+# x.merge_file2(x.size_of_batch_nb)
+
+# # Merging all link stat into a dict and gettting some statistics
+x = WikiSrapping(True)
+#x.merge_dict()
+x.calc_stat()
 
 # if a == 1:
 #     x = WikiSrapping(True)
@@ -642,7 +690,11 @@ a = 5
 #     x = WikiSrapping(True)
 #     x.merge_file2(300)
 
-if a == 5:
-    x = WikiSrapping(True)
-    #x.merge_dict()
-    x.calc_stat()
+# if a == 5:
+#     x = WikiSrapping(True)
+#     #x.merge_dict()
+#     x.calc_stat()
+
+# x = WikiSrapping(True)
+# # r = x.is_reaal("Emmanuel_Macron")
+# print(r)

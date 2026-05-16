@@ -2,8 +2,7 @@ import subprocess
 import sys
 
 processes = []
-xxx = 300
-
+xxx = 50
 for batch_nb in range(xxx):  # 0 to xxx
     p = subprocess.Popen([
         sys.executable,

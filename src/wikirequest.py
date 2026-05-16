@@ -48,7 +48,7 @@ class Scrapdata():
 class WikiSrapping(Scrapdata):
     def __init__(self,headless=False):
         # self.driver = Scrapdata(headless).driver
-        path = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\error_people_dir\list_of_error_people2.txt"
+        path = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\error_people_dir\list_of_error_people.txt"
         self.all_file = self.print_file_content(path).split("\n")
         xxx = 49
         
@@ -133,6 +133,34 @@ class WikiSrapping(Scrapdata):
 
             # Get visible text only
             text = soup.get_text(" ", strip=True).lower()
+            text2 = soup.get_text(" ", strip=True)
+            
+
+            if "_en_" in user_to_search and "Biographies" in text2:
+                return False,url
+            skip = False
+            for word in banned_word:
+                if word in user_to_search:
+                    #print("yooooo " , name)
+                    skip = True
+                    break
+            
+
+
+            if "Cet article présente les faits marquants de" in text2:
+                return False, url    
+            if "Cet article concerne des événements prévus ou attendus." in text2:
+                return False, url    
+            
+
+            if "Le présent article donne différentes informations sur" in text2:
+                return False , url
+            
+            if "Cette page concerne des événements d'actualité qui se sont produits" in text2:
+                return False, url    
+            if skip:
+                return False, url
+            
             
            # ---- FICTION ----
             if (
@@ -159,8 +187,8 @@ class WikiSrapping(Scrapdata):
             ) or (
                 
                 ("naissance" in text and "activité principale" in text) or 
-                ("biographie" in text and "naissance" in text) or 
-                ("biographie" in text and "décès" in text)
+                ("Biographie" in text2 and "naissance" in text) or 
+                ("Biographie" in text2 and "décès" in text)
             ):    return True, url
 
             # ---- VRAIE PERSONNE : catégories ----
@@ -218,7 +246,7 @@ class WikiSrapping(Scrapdata):
 
         for index , page in enumerate(self.all_file):
             
-            if index % (len(self.all_file) / 10) == 0:
+            if index % 2500 == 0:
                 print(f"{page} {index} {(index/int(len(self.all_file))) * 100}% done")
 
             
@@ -260,5 +288,12 @@ class WikiSrapping(Scrapdata):
                 # self.write_into_file(rf"already_done_page_link{batch_nb}.txt",page_link+"\n")
 
 
+
+start = time.time()
+
 x = WikiSrapping(True)
 x.run_script(int(sys.argv[1]))
+
+end = time.time()
+
+print(f"Total runtime of the program is {end - start} seconds")

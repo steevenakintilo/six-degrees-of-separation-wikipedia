@@ -26,6 +26,7 @@ banned_word = [
     "Péplum",
     "Encore le roman feuilleton",
     "P:LSP",
-    "Éditions"
+    "Éditions",
+    "Mouvement_",
+    "P:AN"
 ]
-

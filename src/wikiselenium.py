@@ -171,8 +171,34 @@ class WikiSrapping(Scrapdata):
                     EC.element_to_be_clickable((By.XPATH, "/html/body"))
             )
             text = info_box.text
- 
-           # ---- FICTION ----
+            text_normal = info_box.text
+                            
+            
+            if "_en_" in user_to_search and "Biographies" in text_normal:
+                return False,url
+            skip = False
+            for word in banned_word:
+                if word in user_to_search:
+                    #print("yooooo " , name)
+                    skip = True
+                    break
+            
+
+
+            if "Cet article présente les faits marquants de" in text_normal:
+                return False, url    
+            if "Cet article concerne des événements prévus ou attendus." in text_normal:
+                return False, url    
+            
+            if "Le présent article donne différentes informations sur" in text_normal:
+                return False , url
+            
+            if "Cette page concerne des événements d'actualité qui se sont produits" in text_normal:
+                return False, url    
+            if skip:
+                return False, url
+            
+            # ---- FICTION ----
             if (
                 "personnage de fiction apparaissant dans" in text or
                 "personnage de fiction" in text or
@@ -191,14 +217,14 @@ class WikiSrapping(Scrapdata):
                     "date de naissance" in text or
                     "lieu de naissance" in text
                 ) and (
-                    "biographie" in text or
+                    "Biographie" in text_normal or
                     "informations générales" in text
                 )
             ) or (
                 
                 ("naissance" in text and "activité principale" in text) or 
-                ("biographie" in text and "naissance" in text) or 
-                ("biographie" in text and "décès" in text)
+                ("Biographie" in text_normal and "naissance" in text) or 
+                ("Biographie" in text_normal and "décès" in text)
             ):    return True, url
 
             # ---- VRAIE PERSONNE : catégories ----
