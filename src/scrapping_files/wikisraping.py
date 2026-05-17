@@ -589,7 +589,7 @@ class WikiSrapping(Scrapdata):
         print(f"% of people withouth a link on the whole wikipedia fr {int((nb_of_people_withouth_link/len(list_of_dict_link)) * 100)}")
         print(f"Number of people with a link on the whole wikipedia fr {len(list_of_dict_link) - nb_of_people_withouth_link}")
         print(f"% of people with a link on the whole wikipedia fr {100 - int((nb_of_people_withouth_link/len(list_of_dict_link)) * 100)}")
-        print(f"Average number of link per person who have atleast 1 link on the whole wikipedia fr {round(nb_of_people_with_link/nb_total_with_link,2)}")
+        print(f"Average number of link per person who have atleast 1 link on the whole wikipedia fr {round((nb_of_people_with_link - nb_of_people_withouth_link)/nb_total_with_link,2)}")
         
         paired = list(zip(list_of_link_name, list_of_link_nb))
 
@@ -665,6 +665,8 @@ a = 5
 
 # # Merging all link stat into a dict and gettting some statistics
 x = WikiSrapping(True)
+# r = x.get_all_link_of_a_page("Lili_Leignel")
+# print(r)
 #x.merge_dict()
 x.calc_stat()
 
