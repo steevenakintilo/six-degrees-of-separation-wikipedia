@@ -45,6 +45,7 @@ class WikiNode():
     #def sort_list_by_popularity():
     
     def loop_through_people(self,page_name,base_person="",target_person="",nb_max=0):
+        
         link_of_user = self.get_person_links(page_name)
         self.path_of_people.append(page_name)
         self.list_of_path_by_sub_user.append(link_of_user)
@@ -130,21 +131,32 @@ class WikiNode():
             json.dump(dict_link_sorted, f,ensure_ascii=False,indent=4)
     
     def start(self):
-        
+    
         start = time.time()
         person1 = "Jean-Pierre_Bertrand_(pianiste)"
-        person2 = "Ray Charles"
+        person1 = "Ray Charles"
         person2 = "Jules César"
         person2 = "Mahomet"
-        person2 = "Emmanuel Macron"
-        #person2 = "Billie Eilish"
-        #person2 = "Élisabeth Ancel"
-        #person2 = "Eugène Devéria"
+        #person2 = "Jésus de Nazareth"
+        person2 = "Billie Eilish"
+        #person1 = "Eugène Devéria"
+        
+        #person2 = "Mao Zedong"
         
         self.path_of_people.append(person1)
         link_of_person1 = self.get_person_links(person1)
-
+        link_of_person2 = self.get_person_links(person2)
+        
         print(link_of_person1)
+        print(link_of_person2)
+        
+        
+        if len(link_of_person1) == 0:
+            print(f"{person1} has no links on it's wikipedia page")
+            return
+        if person2 in link_of_person1:
+            print(f"{person2} is inside the wikipedia of {person1}")
+            return
         #print(self.get_person_links(person2))
         print("\n\n\n")
         for user in link_of_person1:
@@ -177,6 +189,7 @@ class WikiNode():
             print(f"All path size {occurence_of_element_list}")
             print(f"Smallest path size {len(smallest_people_list)}")
             print(smallest_people_list)
+        
         
         end = time.time()
 

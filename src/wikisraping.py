@@ -56,11 +56,11 @@ class WikiSrapping(Scrapdata):
         #self.driver = Scrapdata(headless).driver
         self.all_file = self.print_file_content("../all_wikipedia_page_fr.txt").split("\n")
         #self.all_real_people = self.print_file_content(rf"{CODE_PATH}\real_people_dir\list_of_real_people_diff.txt").split("\n")
-        self.all_real_people = self.print_file_content(rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\real_people_dir\list_of_real_people_diff.txt").split("\n")
+        self.all_real_people = self.print_file_content(rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\real_people_dir\real_people_diff_withouth_doublon.txt").split("\n")
         
         self.all_real_people_set = set(self.all_real_people)
         
-        self.size_of_batch_nb = 50
+        self.size_of_batch_nb = 100
         self.chunck_size = int(len(self.all_real_people_set)/self.size_of_batch_nb)
         #self.chunck_size = 10
         #self.zim = Archive("../wikipedia_fr_all_maxi_2026-02.zim")
@@ -112,7 +112,7 @@ class WikiSrapping(Scrapdata):
 
     def split_list(self,lst, chunk_size):
         return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
-
+    
     def print_file_content(self,path):
         """A function that print the content of a file"""
         f = open(path, 'r',encoding="utf-8")    
@@ -665,10 +665,11 @@ a = 5
 
 # # Merging all link stat into a dict and gettting some statistics
 x = WikiSrapping(True)
-# r = x.get_all_link_of_a_page("Lili_Leignel")
-# print(r)
-#x.merge_dict()
+# # r = x.get_all_link_of_a_page("Lili_Leignel")
+# # print(r)
+x.merge_dict()
 x.calc_stat()
+
 
 # if a == 1:
 #     x = WikiSrapping(True)
