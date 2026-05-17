@@ -10,3 +10,5 @@ File name wikipedia_fr_all_maxi_2026-02
 Download folder of real people from this archive:
 
 https://drive.google.com/drive/folders/1UYFh8I5bjSn9fLi4iCDX7ubqZXSqkEkV?usp=sharing
+
+Put the folder inside src folder.
