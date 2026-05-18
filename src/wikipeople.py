@@ -4,10 +4,10 @@ import time
 import json
 
 import sys
-sys.setrecursionlimit(1000)
+sys.setrecursionlimit(10000)
 
 FILE_PATH = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\list_of_link_of_all_users.json"
-FILE_PATH = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\list_of_link_of_all_users_sorted.json"
+#FILE_PATH = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\list_of_link_of_all_users_sorted.json"
 
 class WikiNode():
     """"""
@@ -21,12 +21,23 @@ class WikiNode():
         self.path_of_people_list_of_list_len = []
         self.list_of_path_by_sub_user = []
         
+        self.all_real_people = self.print_file_content(rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\real_people_dir\real_people_diff_withouth_doublon.txt").split("\n")
+        self.all_real_people_set = set(self.all_real_people)
+
+        
         self.final_path_list = []
         with open(FILE_PATH, "r", encoding="utf-8") as file:
             self.people_links = json.load(file)
         
         pass
 
+
+    def print_file_content(self,path):
+        """A function that print the content of a file"""
+        f = open(path, 'r',encoding="utf-8")    
+        content = f.read()
+        f.close()
+        return(content)
     
     def get_person_links(self, name):
         name = name.replace("_"," ")
@@ -73,7 +84,9 @@ class WikiNode():
                     continue
                 link_of_next_user = self.get_person_links(user)
                 
-                if user not in self.path_of_people and link_of_user != link_of_next_user and len(link_of_next_user) != 0 and user != base_person and link_of_next_user not in self.list_of_path_by_sub_user:
+                #if user not in self.path_of_people and link_of_user != link_of_next_user and len(link_of_next_user) != 0 and user != base_person and link_of_next_user not in self.list_of_path_by_sub_user:
+
+                if user not in self.path_of_people and link_of_user != link_of_next_user and len(link_of_next_user) != 0 and user != base_person:
                     self.loop_through_people(user,base_person,target_person,nb_max+1)
         pass
     
@@ -91,11 +104,13 @@ class WikiNode():
             skip = False
             list_of_occurence = []
             list_of_user = []
-        
             for u in user_links:
+                
                 try:
                     list_of_user.append(u)
                     list_of_occurence.append(self.people_top[u.replace("_"," ")])
+                    # else:
+                    #     print("not in set " , u)
                 except:
                     skip = True   
 
@@ -117,6 +132,7 @@ class WikiNode():
                     print(list_of_element,occurence_of_element_list)
                     print("\n\n\n\n")
                 
+                
             else:
                 dict_link_sorted[user] = user_links    
                 #pass    
@@ -127,18 +143,24 @@ class WikiNode():
             
                 
         
+        #print(dict_link_sorted)
+
         with open("list_of_link_of_all_users_sorted.json", "w",encoding="utf-8") as f:
             json.dump(dict_link_sorted, f,ensure_ascii=False,indent=4)
     
     def start(self):
-    
+        
+        # self.fix_list()
+        # return
+        
+        
         start = time.time()
         person1 = "Jean-Pierre_Bertrand_(pianiste)"
-        person1 = "Ray Charles"
+        person2 = "Ray Charles"
         person2 = "Jules César"
         person2 = "Mahomet"
-        #person2 = "Jésus de Nazareth"
-        person2 = "Billie Eilish"
+        person2 = "Jésus de Nazareth"
+        #person2 = "Billie Eilish"
         #person1 = "Eugène Devéria"
         
         #person2 = "Mao Zedong"
@@ -148,7 +170,7 @@ class WikiNode():
         link_of_person2 = self.get_person_links(person2)
         
         print(link_of_person1)
-        print(link_of_person2)
+        #print(link_of_person2)
         
         
         if len(link_of_person1) == 0:

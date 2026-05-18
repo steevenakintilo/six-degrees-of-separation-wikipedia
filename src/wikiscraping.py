@@ -128,25 +128,25 @@ class WikiSrapping(Scrapdata):
         except FileNotFoundError:
             pass
 
-    def is_user_real2(self,user_to_search,batch_nb=0):
-        try:
-            self.driver.get(f"https://fr.wikipedia.org/wiki/{user_to_search}")
-            info_box = WebDriverWait(self.driver, WAIT_TIME).until(
-                    EC.element_to_be_clickable((By.XPATH, "/html/body"))
-                )
-            whole_page_text = info_box.text
+    # def is_user_real2(self,user_to_search,batch_nb=0):
+    #     try:
+    #         self.driver.get(f"https://fr.wikipedia.org/wiki/{user_to_search}")
+    #         info_box = WebDriverWait(self.driver, WAIT_TIME).until(
+    #                 EC.element_to_be_clickable((By.XPATH, "/html/body"))
+    #             )
+    #         whole_page_text = info_box.text
 
-            if "Personnage de fiction apparaissant dans" in whole_page_text:
-                return False , f"https://fr.wikipedia.org/wiki/{user_to_search}"
+    #         if "Personnage de fiction apparaissant dans" in whole_page_text:
+    #             return False , f"https://fr.wikipedia.org/wiki/{user_to_search}"
             
-            elif "Biographie" in whole_page_text and "Naissance" in whole_page_text:
-                return True , f"https://fr.wikipedia.org/wiki/{user_to_search}"
-            else:
-                return False , f"https://fr.wikipedia.org/wiki/{user_to_search}"
+    #         elif "Biographie" in whole_page_text and "Naissance" in whole_page_text:
+    #             return True , f"https://fr.wikipedia.org/wiki/{user_to_search}"
+    #         else:
+    #             return False , f"https://fr.wikipedia.org/wiki/{user_to_search}"
             
 
-        except:
-            return None , f"https://fr.wikipedia.org/wiki/{user_to_search}"
+    #     except:
+    #         return None , f"https://fr.wikipedia.org/wiki/{user_to_search}"
 
 
     
@@ -473,7 +473,7 @@ class WikiSrapping(Scrapdata):
                 if word in link:
                     skip = True
                     break
-            if page_name != link and skip == False:
+            if page_name != link and skip == False and page_name in self.all_real_people_set:
                 new_list_of_link.append(link)
         
         return new_list_of_link
@@ -481,7 +481,6 @@ class WikiSrapping(Scrapdata):
     def merge_dict(self):
         list_of_dict_link = self.print_file_content(rf"{CODE_PATH}\link_of_people_dir\link_of_people_link.txt").split("\n")
         dict_of_link = {}
-        
 
         for i , link in enumerate(list_of_dict_link):
             if i % 93000 == 0:
