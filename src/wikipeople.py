@@ -9,12 +9,14 @@ try:
 except:
     MAX_NUMBER_OF_DEPTH = 2500
 
-if MAX_NUMBER_OF_DEPTH < 100:
-    MAX_NUMBER_OF_DEPTH = 500
+if MAX_NUMBER_OF_DEPTH < 9:
+    MAX_NUMBER_OF_DEPTH = 10
+
 sys.setrecursionlimit(MAX_NUMBER_OF_DEPTH)
 
 #FILE_PATH = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\list_of_link_of_all_users.json"
-FILE_PATH = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\list_of_link_of_all_users_sorted.json"
+FILE_PATH = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\list_of_link_of_all_users_sorted_by_number_of_link_on_other_page.json"
+FILE_PATH = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\list_of_link_of_all_users_sorted_by_number_of_link_on_page.json"
 
 class WikiNode():
     """"""
@@ -62,12 +64,16 @@ class WikiNode():
 
     #def sort_list_by_popularity():
     
-    def loop_through_people(self,page_name,base_person="",target_person="",nb_max=0):
+    def loop_through_people(self,page_name,base_person="",target_person="",nb_max=0,number_of_people_to_see_per_page=0):
         
         link_of_user = self.get_person_links(page_name)
+        # if page_name in link_of_user:
+        #     return
+        
+
         self.path_of_people.append(page_name)
         self.list_of_path_by_sub_user.append(link_of_user)
-        if nb_max > self.max_number_of_depth:
+        if nb_max > self.max_number_of_depth or page_name == base_person or self.path_of_people.count(page_name) != 1:
             #print("oooooh")
             #time.sleep(10000)
             return
@@ -78,7 +84,7 @@ class WikiNode():
             #print("yeeeaaaaah")
             
             self.path_of_people.append(target_person)
-            if self.path_of_people.count(target_person) == 1:
+            if self.path_of_people.count(target_person) == 1 and [base_person] + self.path_of_people not in self.path_of_people_list_of_list:
                 self.final_path_list = [base_person] + self.path_of_people
                 #print(self.final_path_list,len(self.final_path_list))
                 self.path_of_people_list_of_list.append(self.final_path_list)
@@ -87,21 +93,29 @@ class WikiNode():
             return
             #time.sleep(100000)
         
-        if nb_max <= self.max_number_of_depth and target_person not in link_of_user:
-            for user in link_of_user:
-                if user == "Autobiographie":
-                    continue
-                link_of_next_user = self.get_person_links(user)
-                
-                #if user not in self.path_of_people and link_of_user != link_of_next_user and len(link_of_next_user) != 0 and user != base_person and link_of_next_user not in self.list_of_path_by_sub_user:
+        for index , userr in enumerate(link_of_user):
+            user = link_of_user[index]
+            if user == "Autobiographie":
+                continue
+            link_of_next_user = self.get_person_links(user)
+            if index + number_of_people_to_see_per_page < len(link_of_user):
+                user = link_of_user[index + number_of_people_to_see_per_page]
+                #print("fineeee " , user , len(link_of_next_user),index + number_of_people_to_see_per_page)
+            else:
+                #print("tooo big " , user,len(link_of_next_user),index + number_of_people_to_see_per_page)
+                user = userr
+            
+            #if user not in self.path_of_people and link_of_user != link_of_next_user and len(link_of_next_user) != 0 and user != base_person and link_of_next_user not in self.list_of_path_by_sub_user:
 
-                if user not in self.path_of_people and link_of_user != link_of_next_user and len(link_of_next_user) != 0 and user != base_person:
-                    self.loop_through_people(user,base_person,target_person,nb_max+1)
+            if user not in self.path_of_people and link_of_user != link_of_next_user and len(link_of_next_user) != 0 and user != base_person and link_of_next_user not in self.list_of_path_by_sub_user:
+                #print("user " , page_name , link_of_user)
+                #print("\n")
+                self.loop_through_people(user,base_person,target_person,nb_max+1)
         pass
     
 
     def fix_list(self):
-        with open(FILE_PATH, "r", encoding="utf-8") as file:
+        with open(FILE_PATH2, "r", encoding="utf-8") as file:
             self.people_top = json.load(file)
         
         index = 0
@@ -170,27 +184,31 @@ class WikiNode():
         person2 = "Jules César"
         person2 = "Mahomet"
         person2 = "Jésus de Nazareth"
-        person2 = "Wolfgang Amadeus Mozart"
-        person1 = "Emmanuel Macron"
-        person2 = "Linus Torvalds"
+        #person2 = "Wolfgang Amadeus Mozart"
+        #person2 = "Emmanuel Macron"
+        #person2 = "Linus Torvalds"
         #person2 = "Billie Eilish"
         #person2 = "Mao Zedong"
         
         #person2 = "David Belle"
         
-        #person2 = "Billie Eilish"
-        #person1 = "Eugène Devéria"
-        #person1 = "Emmanuel Macron"
-        
+        person2 = "Billie Eilish"
+        #person2 = "Eugène Devéria"
+        #person2 = "John Lee Hooker"
+        #person2 = "Emmanuel Macron"
+        person2 = "David Belle"
         #person2 = "Mao Zedong"
+        #person2 = "Ray Charles"
         
         self.path_of_people.append(person1)
         link_of_person1 = self.get_person_links(person1)
         link_of_person2 = self.get_person_links(person2)
         
+        #link_of_person1 = [link_of_person1[0]]
+
         print(link_of_person1)
         #print(link_of_person2)
-        
+        number_of_people_to_see_per_page  = 1000
         
         if len(link_of_person1) == 0:
             print(f"{person1} has no links on it's wikipedia page")
@@ -204,14 +222,17 @@ class WikiNode():
             #print(user , " copekfpoezkfzekf")
             if user == "Autobiographie":
                 continue
-            self.path_of_people = []
-            self.list_of_path_by_sub_user = []
-            try:
-                self.loop_through_people(user,person1,person2)
-            except RecursionError:
-                #print(self.path_of_people)
-                continue
-           
+            print("current user " , user)
+        
+            for index in range(0 + number_of_people_to_see_per_page):
+                self.path_of_people = []
+                self.list_of_path_by_sub_user = []
+                #print(user,person1,person2,0,index)
+                try:
+                    self.loop_through_people(user,person1,person2,0,index)
+                except RecursionError:
+                    continue
+            
         
         if len(self.path_of_people_list_of_list) == 0:
             print(f"No link found between {person1} and {person2}")
