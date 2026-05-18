@@ -4,10 +4,17 @@ import time
 import json
 
 import sys
-sys.setrecursionlimit(10000)
+try:
+    MAX_NUMBER_OF_DEPTH = int(sys.argv[1])
+except:
+    MAX_NUMBER_OF_DEPTH = 2500
 
-FILE_PATH = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\list_of_link_of_all_users.json"
-#FILE_PATH = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\list_of_link_of_all_users_sorted.json"
+if MAX_NUMBER_OF_DEPTH < 100:
+    MAX_NUMBER_OF_DEPTH = 500
+sys.setrecursionlimit(MAX_NUMBER_OF_DEPTH)
+
+#FILE_PATH = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\list_of_link_of_all_users.json"
+FILE_PATH = rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\list_of_link_of_all_users_sorted.json"
 
 class WikiNode():
     """"""
@@ -15,14 +22,14 @@ class WikiNode():
         #self.person1 = ""
         #self.person2 = ""
         self.list_of_people_link_dict = ijson.parse(open(FILE_PATH, 'r'))
-        self.max_number_of_depth = 10000
+        self.max_number_of_depth = MAX_NUMBER_OF_DEPTH
         self.path_of_people = []
         self.path_of_people_list_of_list = []
         self.path_of_people_list_of_list_len = []
         self.list_of_path_by_sub_user = []
         
-        self.all_real_people = self.print_file_content(rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\real_people_dir\real_people_diff_withouth_doublon.txt").split("\n")
-        self.all_real_people_set = set(self.all_real_people)
+        # self.all_real_people = self.print_file_content(rf"C:\Users\sakin\Desktop\code\six-degrees-of-separation-wikipedia\src\real_people_dir\real_people_diff_withouth_doublon.txt").split("\n")
+        # self.all_real_people_set = set(self.all_real_people)
 
         
         self.final_path_list = []
@@ -69,12 +76,14 @@ class WikiNode():
         
         if target_person in link_of_user:
             #print("yeeeaaaaah")
-            self.path_of_people.append(target_person)
-            self.final_path_list = [base_person] + self.path_of_people
-            #print(self.final_path_list,len(self.final_path_list))
-            self.path_of_people_list_of_list.append(self.final_path_list)
-            self.path_of_people_list_of_list_len.append(len(self.final_path_list))
             
+            self.path_of_people.append(target_person)
+            if self.path_of_people.count(target_person) == 1:
+                self.final_path_list = [base_person] + self.path_of_people
+                #print(self.final_path_list,len(self.final_path_list))
+                self.path_of_people_list_of_list.append(self.final_path_list)
+                self.path_of_people_list_of_list_len.append(len(self.final_path_list))
+                
             return
             #time.sleep(100000)
         
@@ -157,11 +166,21 @@ class WikiNode():
         start = time.time()
         person1 = "Jean-Pierre_Bertrand_(pianiste)"
         person2 = "Ray Charles"
+        
         person2 = "Jules César"
         person2 = "Mahomet"
         person2 = "Jésus de Nazareth"
+        person2 = "Wolfgang Amadeus Mozart"
+        person1 = "Emmanuel Macron"
+        person2 = "Linus Torvalds"
+        #person2 = "Billie Eilish"
+        #person2 = "Mao Zedong"
+        
+        #person2 = "David Belle"
+        
         #person2 = "Billie Eilish"
         #person1 = "Eugène Devéria"
+        #person1 = "Emmanuel Macron"
         
         #person2 = "Mao Zedong"
         
@@ -211,7 +230,8 @@ class WikiNode():
             print(f"All path size {occurence_of_element_list}")
             print(f"Smallest path size {len(smallest_people_list)}")
             print(smallest_people_list)
-        
+            print(f"Smallest path size {len(smallest_people_list)}")
+            
         
         end = time.time()
 
